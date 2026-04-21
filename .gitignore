@@ -1,0 +1,15 @@
+.claude
+.DS_Store
+
+baselines/BLAST/prediction_blast_work
+baselines/DeepGO-SE/*
+!baselines/DeepGO-SE/predictions.tsv
+baselines/TALE/*
+!baselines/TALE/predictions.tsv
+
+fasta/cafa
+fasta/human
+fasta/uniprot
+fasta/*.obo
+fasta/test_esm.pkl
+
