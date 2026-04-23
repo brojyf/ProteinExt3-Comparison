@@ -146,7 +146,7 @@ def parse_args():
     parser.add_argument("--mode", choices=["train", "predict"], required=True, help="train: 训练并保存模型；predict: 加载模型并预测")
     parser.add_argument("--base", default="fasta/uniprot/250101", help="训练集前缀，会自动使用 .fasta 和 .tsv（train 模式需要）")
     parser.add_argument("--in", dest="input_prefix", default="fasta/test", help="测试集前缀，会自动使用 .fasta（predict 模式需要）")
-    parser.add_argument("--out", default="baselines/ESM2+MLP/prediction.tsv")
+    parser.add_argument("--out", default="baselines/ESM2+MLP/predictions.tsv")
     parser.add_argument("--model-path", default="baselines/ESM2+MLP/model.pt", help="模型保存/加载路径")
     parser.add_argument("--model-name", default="facebook/esm2_t6_8M_UR50D")
     parser.add_argument("--min-freq", type=int, default=5)

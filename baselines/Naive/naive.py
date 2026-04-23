@@ -69,7 +69,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="fasta/cafa/cafa", help="训练集前缀，会自动使用 .tsv")
     parser.add_argument("--in", dest="input_prefix", default="fasta/test", help="测试集前缀，会自动使用 .fasta")
-    parser.add_argument("--out", default="baselines/Naive/prediction.tsv")
+    parser.add_argument("--out", default="baselines/Naive/predictions.tsv")
     parser.add_argument("--min-prob", type=float, default=0.01)
     return parser.parse_args()
 

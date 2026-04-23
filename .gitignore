@@ -1,15 +1,19 @@
 .claude
 .DS_Store
+__pycache__
 
 baselines/BLAST/prediction_blast_work
 baselines/DeepGO-SE/*
-!baselines/DeepGO-SE/predictions.tsv
+!baselines/DeepGO-SE/DeepGO-SE.tsv
+baselines/ESM2+MLP/*.pt
 baselines/TALE/*
-!baselines/TALE/predictions.tsv
+!baselines/TALE/TALE.tsv
+baselines/ProteinExt3.1/*
 
 fasta/cafa
 fasta/human
 fasta/uniprot
+fasta/raw
+fasta/open
+fasta/restricted
 fasta/*.obo
-fasta/test_esm.pkl
-

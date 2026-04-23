@@ -232,7 +232,7 @@ def parse_args():
     parser.add_argument("--base-fasta", required=True)
     parser.add_argument("--base-truth", required=True)
     parser.add_argument("--in", dest="input_fasta", required=True)
-    parser.add_argument("--out", default="baselines/BLAST/prediction.tsv")
+    parser.add_argument("--out", default="baselines/BLAST/predictions.tsv")
     parser.add_argument("--num-threads", type=int, default=max(1, (os.cpu_count() or 1) - 1))
     parser.add_argument("--evalue", type=float, default=1e-3)
     parser.add_argument("--max-target-seqs", type=int, default=20)
