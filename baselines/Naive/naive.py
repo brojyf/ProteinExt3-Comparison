@@ -68,7 +68,7 @@ def build_io_paths(base_prefix: str, input_prefix: str, output_path: str) -> dic
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="fasta/cafa/cafa", help="训练集前缀，会自动使用 .tsv")
-    parser.add_argument("--in", dest="input_prefix", default="fasta/test", help="测试集前缀，会自动使用 .fasta")
+    parser.add_argument("--in", dest="input_prefix", default="fasta/open/test", help="测试集前缀，会自动使用 .fasta")
     parser.add_argument("--out", default="baselines/Naive/predictions.tsv")
     parser.add_argument("--min-prob", type=float, default=0.01)
     return parser.parse_args()
@@ -98,7 +98,6 @@ def main():
     go_probs = {
         go_term: count / total_proteins
         for go_term, count in go_counts.items()
-        if count / total_proteins >= args.min_prob
     }
 
     output_tsv.parent.mkdir(parents=True, exist_ok=True)

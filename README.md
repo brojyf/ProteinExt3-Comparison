@@ -45,13 +45,15 @@ We report results under an **open label-space** setting: predictions were evalua
 ### Metrics
 
 Following the CAFA protein-centric evaluation protocol, we assessed performance using
-four complementary metrics: (F_{\max}), (S_{\min}), Micro-AUPR, and Micro-AUC.
+four complementary metrics: (F_{\max}), (S_{\min}), protein-centric AUPR, and
+class-centric average AUC.
 (F_{\max}) was computed as the maximum F-score over 101 thresholds from 0.00 to 1.00,
 where precision was averaged over proteins with at least one prediction at a given
 threshold and recall was averaged over all benchmark proteins. (S_{\min}) was defined
 as the minimum semantic distance derived from remaining uncertainty and
 misinformation, both weighted by information accretion (IA); IA values were obtained
 independently from training annotations via an external pickle file. In addition, we
-reported Micro-AUPR and Micro-AUC over all propagated ((protein, term)) entries to
-evaluate the global ranking quality and overall discriminative ability of the
-prediction scores.
+reported protein-centric AUPR by integrating the protein-level precision-recall curve
+over the same 101 thresholds, and class-centric average AUC by computing a ROC AUC
+for each GO term and averaging over terms with both positive and negative benchmark
+examples.

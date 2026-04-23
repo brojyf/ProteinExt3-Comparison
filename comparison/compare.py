@@ -451,7 +451,6 @@ def compute_threshold_profiles(truth: np.ndarray, pred: np.ndarray, ic: np.ndarr
     truth_ic_sum = (truth * ic[None, :]).sum(axis=1, dtype=np.float64)
 
     q = quantize_scores_0_100(pred)
-    truth_f = truth.astype(np.float32)
 
     pred_count_ge = np.zeros((n_proteins, 101), dtype=np.int32)
     inter_count_ge = np.zeros((n_proteins, 101), dtype=np.int32)
@@ -492,27 +491,23 @@ def compute_threshold_profiles(truth: np.ndarray, pred: np.ndarray, ic: np.ndarr
     }
 
 
-def compute_fmax_smin_from_profiles(profiles):
+def compute_protein_centric_pr_from_profiles(profiles):
     truth_count = profiles["truth_count"]
-    truth_ic_sum = profiles["truth_ic_sum"]
     pred_count_ge = profiles["pred_count_ge"]
     inter_count_ge = profiles["inter_count_ge"]
-    pred_ic_ge = profiles["pred_ic_ge"]
-    inter_ic_ge = profiles["inter_ic_ge"]
 
     n_proteins = truth_count.shape[0]
     if n_proteins == 0:
-        return 0.0, 0.0, 0.0, 0.0
+        zeros = np.zeros(101, dtype=np.float64)
+        return zeros, zeros
 
     pred_any = pred_count_ge > 0
-
     precision_per_protein = np.divide(
         inter_count_ge,
         pred_count_ge,
         out=np.zeros_like(inter_count_ge, dtype=np.float64),
         where=pred_count_ge > 0,
     )
-
     predicted_protein_count = pred_any.sum(axis=0)
     precision_sum = precision_per_protein.sum(axis=0)
 
@@ -525,6 +520,32 @@ def compute_fmax_smin_from_profiles(profiles):
 
     recall_per_protein = inter_count_ge / truth_count[:, None]
     avg_recall = recall_per_protein.mean(axis=0)
+    return avg_precision, avg_recall
+
+
+def compute_protein_centric_aupr(avg_precision: np.ndarray, avg_recall: np.ndarray) -> float:
+    recall = avg_recall[::-1]
+    precision = avg_precision[::-1]
+
+    recall = np.r_[0.0, recall]
+    precision = np.r_[1.0, precision]
+    recall = np.maximum.accumulate(recall)
+
+    area = np.sum((recall[1:] - recall[:-1]) * (precision[1:] + precision[:-1]) / 2.0)
+    return float(area)
+
+
+def compute_fmax_smin_from_profiles(profiles):
+    truth_count = profiles["truth_count"]
+    truth_ic_sum = profiles["truth_ic_sum"]
+    pred_ic_ge = profiles["pred_ic_ge"]
+    inter_ic_ge = profiles["inter_ic_ge"]
+
+    n_proteins = truth_count.shape[0]
+    if n_proteins == 0:
+        return 0.0, 0.0, 0.0, 0.0
+
+    avg_precision, avg_recall = compute_protein_centric_pr_from_profiles(profiles)
 
     denom = avg_precision + avg_recall
     f_all = np.divide(
@@ -549,6 +570,28 @@ def compute_fmax_smin_from_profiles(profiles):
     return best_f, best_s, best_f_step / 100.0, best_s_step / 100.0
 
 
+def compute_class_centric_mean_auc(truth: np.ndarray, pred: np.ndarray) -> float:
+    n_proteins, n_terms = truth.shape
+    if n_proteins == 0 or n_terms == 0:
+        return 0.0
+
+    positive_counts = truth.sum(axis=0).astype(np.int32)
+    valid_mask = (positive_counts > 0) & (positive_counts < n_proteins)
+    valid_indices = np.flatnonzero(valid_mask)
+    if valid_indices.size == 0:
+        return 0.0
+
+    auc_values = []
+    for idx in valid_indices:
+        auc_values.append(
+            grouped_roc_auc(
+                truth[:, idx].astype(np.int8, copy=False),
+                pred[:, idx],
+            )
+        )
+    return float(np.mean(auc_values))
+
+
 def compute_metrics_from_matrices(matrix_pack):
     truth = matrix_pack["truth"]
     pred = matrix_pack["pred"]
@@ -558,14 +601,11 @@ def compute_metrics_from_matrices(matrix_pack):
     if n_proteins == 0 or n_terms == 0:
         return 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-    flat_truth = truth.reshape(-1).astype(np.int8, copy=False)
-    flat_pred = pred.reshape(-1)
-
-    aupr = grouped_pr_area(flat_truth, flat_pred)
-    auc = grouped_roc_auc(flat_truth, flat_pred)
-
     profiles = compute_threshold_profiles(truth, pred, ic)
+    avg_precision, avg_recall = compute_protein_centric_pr_from_profiles(profiles)
     fmax, smin, f_thr, s_thr = compute_fmax_smin_from_profiles(profiles)
+    aupr = compute_protein_centric_aupr(avg_precision, avg_recall)
+    auc = compute_class_centric_mean_auc(truth, pred)
 
     return fmax, smin, aupr, auc, f_thr, s_thr
 

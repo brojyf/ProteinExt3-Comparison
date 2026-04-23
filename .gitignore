@@ -2,6 +2,8 @@
 .DS_Store
 __pycache__
 
+baselines/Naive/*
+!baselines/Naive/naive.py
 baselines/BLAST/prediction_blast_work
 baselines/DeepGO-SE/*
 !baselines/DeepGO-SE/DeepGO-SE.tsv
@@ -9,11 +11,12 @@ baselines/ESM2+MLP/*.pt
 baselines/TALE/*
 !baselines/TALE/TALE.tsv
 baselines/ProteinExt3.1/*
+baselines/ProteinExt3/*
 
 fasta/cafa
 fasta/human
 fasta/uniprot
 fasta/raw
-fasta/open
+fasta/
 fasta/restricted
 fasta/*.obo

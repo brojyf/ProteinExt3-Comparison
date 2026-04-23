@@ -286,10 +286,9 @@ def run_predict(args):
         for row_index, protein_id in enumerate(query_protein_ids):
             for col_index, go_term in enumerate(frequent_gos):
                 score = float(predictions[row_index, col_index])
-                if score >= args.threshold:
-                    aspect = go_to_aspect.get(go_term, "")
-                    file.write(f"{protein_id}\t{go_term}\t{score:.6f}\t{aspect}\n")
-                    written_rows += 1
+                aspect = go_to_aspect.get(go_term, "")
+                file.write(f"{protein_id}\t{go_term}\t{score:.6f}\t{aspect}\n")
+                written_rows += 1
 
     print(f"input_fasta: {input_fasta}")
     print(f"output_tsv: {output_tsv}")
